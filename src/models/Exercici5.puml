@@ -1,0 +1,9 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+actor Client as c
+boundary "Sistema de Biblioteca" as ui
+
+autonumber
+c -> ui: Fer comanda
+@enduml

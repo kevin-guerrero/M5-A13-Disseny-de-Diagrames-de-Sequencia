@@ -1,0 +1,23 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+actor Client as c
+boundary GUI as ui
+control GestoirCompra as gc
+database Hotels as H
+
+
+c -> ui : veure llistat hotels
+ui -> gc : consultarHotels()
+gc -> H : Consultar Hotels
+H -> gc : hotels
+gc -> ui : llista hotels
+c -> ui : cercar hotels
+ui -> gc : existeixHotel(hotel)
+alt existeix-hotel?
+    gc -> ui : true
+else
+    gc -> ui: false
+end
+
+@enduml
