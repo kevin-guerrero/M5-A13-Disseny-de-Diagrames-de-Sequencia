@@ -1,0 +1,35 @@
+@startuml
+header CU Fer Comanda
+
+actor Client as c
+boundary GUI as ui
+control GestorComandes as gc
+entity "Comanda" as cmd
+database "BaseDades" as db
+
+c -> ui : seleccionar fer comanda
+ui -> gc : iniciarComanda()
+gc -> cmd : crearComanda()
+activate cmd
+
+c -> ui : seleccionar plats
+ui -> gc : afegirPlat(plat)
+gc -> cmd : afegirPlat(plat)
+cmd -> db : guardarPlat()
+
+c -> ui : finalitzar selecció
+ui -> gc : finalitzarSeleccio()
+
+alt vol afegir propina?
+    c -> ui : afegir propina
+    ui -> gc : afegirPropina(quantitat)
+    gc -> cmd : setPropina(quantitat)
+end
+
+gc -> cmd : finalitzarComanda()
+cmd -> db : guardarComanda()
+db --> gc : confirmaciό
+gc --> ui : mostrarConfirmacio()
+deactivate cmd
+
+@enduml

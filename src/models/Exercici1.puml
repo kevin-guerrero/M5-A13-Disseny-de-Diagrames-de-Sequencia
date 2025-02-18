@@ -3,7 +3,7 @@
 
 actor Client as c
 boundary GUI as ui
-control GestoirCompra as gc
+control GestorCompra as gc
 database Hotels as H
 
 
@@ -20,4 +20,37 @@ else
     gc -> ui: false
 end
 
+@enduml
+
+@startuml
+header CU Fer compra hotel
+
+actor Client as c
+boundary GUI as ui
+control GestorCompra as gc
+entity Hotel as h
+control "PassarelaCompra" as pc
+
+c -> ui : escull hotel
+ui -> gc : consultarDisponibilitat(Hotel)
+gc -> h : getDiponibilitat()
+
+
+alt Hotel Disponible ?
+    h -> gc : true
+    gc -> h : setReservat()
+    gc -> ui : confirmació reserva
+    c -> ui : pagar reserva
+    ui -> gc : ferpagament(Hotel)
+    gc -> pc : ferpagament(diners)
+    alt pagamentOK ?
+        pc --> gc : true
+    else
+        pc --> gc : false
+        gc -> ui : missatge d'error de pagament
+    end
+else
+    h -> gc : false
+    gc -> ui : missatge d'error
+end
 @enduml

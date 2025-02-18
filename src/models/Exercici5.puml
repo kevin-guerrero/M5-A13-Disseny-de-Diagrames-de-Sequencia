@@ -1,9 +1,105 @@
 @startuml
-'https://plantuml.com/sequence-diagram
+header CU Fer Comanda
 
 actor Client as c
-boundary "Sistema de Biblioteca" as ui
+boundary GUI as ui
+control GestorComandes as gc
+entity "Restaurant" as rest
 
-autonumber
-c -> ui: Fer comanda
+c -> ui : Iniciar comanda
+ui -> gc : crearComanda()
+gc -> rest : verificarDisponibilitat()
+
+alt plats disponibles
+    rest -> gc : confirmació
+    gc -> ui : mostrar menú
+    c -> ui : seleccionar plats
+    ui -> gc : afegirPlatsComanda(plats)
+
+    alt afegir propina?
+        c -> ui : Afegir propina
+        ui -> gc : afegirPropina(quantitat)
+    end
+
+    c -> ui : Procedir al pagament
+    ui -> gc : processarPagament()
+    gc -> rest : validarPagament()
+
+    alt pagament correcte
+        rest -> gc : confirmació pagament
+        gc -> rest : guardarComanda()
+        rest -> gc : confirmació
+        gc -> ui : mostrar confirmació
+    else
+        rest -> gc : error de pagament
+        gc -> ui : mostrar error pagament
+    end
+else
+    rest -> gc : error de disponibilitat
+    gc -> ui : mostrar missatge error
+end
+
+@enduml
+
+@startuml
+header CU Veure Comandes Pendents
+
+actor Cuiner as cu
+boundary GUI as ui
+control "GestorComandes" as gc
+entity "Restaurant" as rest
+
+cu -> ui : Consultar comandes pendents
+ui -> gc : obtenirComandesPendents()
+gc -> rest : consultarComandes()
+rest -> gc : retornar comandes pendents
+gc -> ui : mostrar comandes pendents
+ui --> cu : visualitzar comandes
+
+@enduml
+
+@startuml
+header CU Lliurar Comanda
+
+actor Repartidor as r
+boundary GUI as ui
+control "GestorComandes" as gc
+entity "Restaurant" as rest
+
+r -> ui : Lliurar comanda
+ui -> gc : obtenirComandesPreparades()
+gc -> rest : consultarComandesPreparades()
+rest -> gc : llistaComandes
+gc -> ui : mostrar comandes disponibles
+
+r -> ui : seleccionar comanda
+ui -> gc : confirmarLliurament(idComanda)
+gc -> rest : actualitzarEstatComanda()
+rest -> gc : confirmació lliurament
+gc -> ui : mostrar confirmació
+
+@enduml
+
+@startuml
+header CU Notificar Entrega
+
+actor Repartidor as r
+boundary GUI as ui
+control "GestorComandes" as gc
+entity "Restaurant" as rest
+actor Client as c
+
+r -> ui : Notificar entrega
+ui -> gc : notificarEntrega(idComanda)
+gc -> rest : actualitzarEstatEntrega()
+rest -> gc : confirmació
+
+alt entrega feta?
+    gc -> rest : enviarNotificacioClient()
+    rest -> c : notificar entrega realitzada
+    gc -> ui : mostrar confirmació
+else
+    gc -> ui : mostrar error
+end
+
 @enduml
